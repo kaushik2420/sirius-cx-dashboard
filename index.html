@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sirius Customer Experience after the merger - Dashboard</title>
+<style>
+  :root{
+    --text:#172B4D; --text-subtle:#44546F; --text-subtlest:#626F86; --text-inverse:#fff;
+    --link:#0C66E4; --brand:#0C66E4; --brand-hover:#0055CC;
+    --surface:#FFFFFF; --sunken:#F7F8F9; --hover:#091E420F; --pressed:#091E4224; --selected:#E9F2FF;
+    --border:#091E4224; --border-bold:#758195;
+    --success-bg:#DCFFF1; --success:#216E4E; --info-bg:#E9F2FF; --info:#0055CC;
+    --danger-bg:#FFECEB; --danger:#AE2E24; --warn-bg:#FFF7D6; --warn:#A54800; --neutral-bg:#F1F2F4;
+    --created:#C9372C; --resolved:#22A06B;
+    --c1:#1D7AFC; --c2:#E56910; --c3:#2898BD; --c4:#943D73; --c5:#8F7EE7;
+    --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, "Helvetica Neue", sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:var(--font);font-size:14px;line-height:20px;color:var(--text);background:var(--surface);-webkit-font-smoothing:antialiased}
+  button{font-family:inherit}
+  a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+
+  /* top nav */
+  .topnav{height:56px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:5}
+  .iconbtn{width:32px;height:32px;border:0;background:transparent;border-radius:3px;display:grid;place-items:center;color:var(--text-subtle);cursor:pointer}
+  .iconbtn:hover{background:var(--hover)}
+  .product{display:flex;align-items:center;gap:8px;font-weight:653;font-size:16px;padding:4px 8px;border-radius:3px;color:var(--text)}
+  .product .mark{width:24px;height:24px;border-radius:6px;background:var(--brand);display:grid;place-items:center}
+  .search{flex:1;max-width:780px;margin:0 auto;height:32px;border:1px solid var(--border-bold);border-radius:6px;display:flex;align-items:center;gap:8px;padding:0 8px;color:var(--text-subtlest)}
+  .btn{height:32px;padding:0 12px;border-radius:3px;border:0;font-weight:500;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:var(--brand);color:#fff} .btn-primary:hover{background:var(--brand-hover)}
+  .btn-default{background:var(--neutral-bg);color:var(--text-subtle)} .btn-default:hover{background:#DCDFE4}
+  .avatar{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;font-weight:653;color:#fff;flex:none}
+
+  .layout{display:flex;min-height:calc(100% - 56px)}
+  /* sidebar */
+  .side{width:240px;flex:none;border-right:1px solid var(--border);padding:12px 8px;display:flex;flex-direction:column;gap:2px;background:var(--surface)}
+  .side .item{display:flex;align-items:center;gap:10px;height:32px;padding:0 8px;border-radius:3px;color:var(--text-subtle);font-size:14px;cursor:default}
+  .side .item:hover{background:var(--hover)}
+  .side .item.sel{background:var(--selected);color:var(--brand);font-weight:500}
+  .side .h{font-size:12px;font-weight:653;color:var(--text-subtlest);padding:14px 8px 4px}
+  .sp{width:20px;height:20px;border-radius:4px;flex:none;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:700}
+  .side .foot{margin-top:auto;font-size:11px;line-height:16px;color:var(--text-subtlest);padding:12px 8px 0}
+
+  /* main */
+  main{flex:1;min-width:0;padding:24px 32px 40px;background:var(--surface)}
+  .crumbs{font-size:14px;color:var(--text-subtlest);margin-bottom:8px}
+  .head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:24px;line-height:28px;font-weight:653;margin:0;flex:1;min-width:280px}
+  .meta{font-size:12px;color:var(--text-subtlest);margin-bottom:20px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .chip{height:32px;border:1px solid var(--border);border-radius:3px;background:var(--surface);padding:0 10px;display:inline-flex;align-items:center;gap:6px;color:var(--text-subtle);font-size:14px;cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--selected);border-color:var(--brand);color:var(--brand)}
+
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .span2{grid-column:1/-1}
+  .gadget{border:1px solid var(--border);border-radius:8px;background:var(--surface);display:flex;flex-direction:column;min-width:0}
+  .ghead{display:flex;align-items:center;gap:8px;padding:12px 12px 8px 16px}
+  .ghead h2{font-size:14px;font-weight:653;margin:0;flex:1}
+  .ghead .src{font-size:12px;color:var(--text-subtlest);font-weight:400}
+  .gbody{padding:4px 16px 16px;position:relative;overflow-x:auto}
+
+  /* KPI tiles */
+  .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+  .kpi{background:var(--sunken);border-radius:6px;padding:12px 14px}
+  .kpi .lab{font-size:12px;color:var(--text-subtle);font-weight:500}
+  .kpi .val{font-size:28px;line-height:34px;font-weight:653;margin-top:4px}
+  .kpi .val small{font-size:14px;color:var(--text-subtlest);font-weight:500}
+  .kpi .sub{font-size:12px;color:var(--text-subtlest);margin-top:2px;display:flex;align-items:center;gap:6px}
+  .delta{display:inline-flex;align-items:center;gap:2px;font-weight:653}
+  .delta.good{color:var(--success)} .delta.bad{color:var(--danger)}
+
+  /* lozenges */
+  .loz{display:inline-block;font-size:11px;line-height:16px;font-weight:700;text-transform:uppercase;padding:0 4px;border-radius:3px;white-space:nowrap}
+  .loz.success{background:var(--success-bg);color:var(--success)}
+  .loz.inprogress{background:var(--info-bg);color:var(--info)}
+  .loz.removed{background:var(--danger-bg);color:var(--danger)}
+  .loz.moved{background:var(--warn-bg);color:var(--warn)}
+  .loz.default{background:var(--neutral-bg);color:var(--text-subtle)}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:12px;font-weight:653;color:var(--text-subtle);padding:6px 8px;border-bottom:2px solid var(--border);white-space:nowrap}
+  td{padding:8px;border-bottom:1px solid var(--border);vertical-align:middle}
+  tr:hover td{background:var(--hover)}
+  td.key{white-space:nowrap} td.key a{font-weight:500} td.nw{white-space:nowrap}
+  #pso .sum{max-width:190px}
+  .sum{max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sla{font-size:12px;font-weight:653;padding:1px 6px;border-radius:3px;white-space:nowrap}
+  .sla.ok{background:var(--success-bg);color:var(--success)} .sla.run{background:var(--info-bg);color:var(--info)}
+  .empty{padding:28px 8px;text-align:center;color:var(--text-subtlest)}
+  .gfoot{font-size:12px;color:var(--text-subtlest);padding:8px 0 0}
+
+  /* charts */
+  svg text{font-family:var(--font)}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--text-subtle);margin:4px 0 6px;flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .tip{position:absolute;pointer-events:none;background:#172B4D;color:#fff;font-size:12px;line-height:16px;padding:6px 8px;border-radius:4px;box-shadow:0 8px 12px #091E4226;white-space:nowrap;opacity:0;transition:opacity .08s;z-index:3}
+  .pie-wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+  .pie-table td{padding:6px 8px;border-bottom:1px solid var(--border)} .pie-table tr:hover td{background:var(--hover)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#172B4D;color:#fff;padding:10px 16px;border-radius:6px;font-size:14px;box-shadow:0 8px 12px #091E4226;opacity:0;transition:opacity .2s;pointer-events:none}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  @media (max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.side{display:none}}
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <button class="iconbtn" aria-label="App switcher"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg></button>
+  <div class="product"><span class="mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M3 12l9-9 9 9-9 9z"/></svg></span>Jira</div>
+  <div class="search" role="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Search</div>
+  <button class="btn btn-primary">+ Create</button>
+  <button class="iconbtn" aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8M13.7 21a2 2 0 01-3.4 0"/></svg></button>
+  <button class="iconbtn" aria-label="Help"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 .5c0 2-2.5 2-2.5 4M12 17h.01"/></svg></button>
+  <span class="avatar" style="background:#5E4DB2">AV</span>
+</header>
+
+<div class="layout">
+  <nav class="side" aria-label="Sidebar">
+    <div class="item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>For you</div>
+    <div class="item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Recent</div>
+    <div class="item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>Starred</div>
+    <div class="h">Spaces</div>
+    <div class="item"><span class="sp" style="background:#6554C0">SC</span>Sirius Customer Care</div>
+    <div class="item"><span class="sp" style="background:#C9372C">PS</span>Product Security Operations</div>
+    <div class="item"><span class="sp" style="background:#0C66E4">CS</span>Cyberdyne Security Eng</div>
+    <div class="h">Recent</div>
+    <div class="item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18M6 12h12M10 19h4"/></svg>Filters</div>
+    <div class="item sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="5" rx="1"/><rect x="13" y="10" width="8" height="11" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg>Dashboards</div>
+    <div class="foot">Demo mock-up with illustrative data, built for the Cyberdyne × Sirius demo. Not an Atlassian product page.</div>
+  </nav>
+
+  <main>
+    <div class="crumbs"><a href="#">Dashboards</a></div>
+    <div class="head">
+      <h1>Sirius Customer Experience after the merger</h1>
+      <button class="iconbtn" aria-label="Star"><svg width="18" height="18" viewBox="0 0 24 24" fill="#E2B203" stroke="#E2B203" stroke-width="1.5"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg></button>
+      <button class="btn btn-default" id="refresh" title="Refresh all gadgets (R)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 11-2.3-5.7M20 4v5h-5"/></svg>Refresh</button>
+      <button class="btn btn-default">Share</button>
+      <button class="btn btn-default">Edit</button>
+    </div>
+    <div class="meta"><span>Owner: <b>Anders van Keessen</b></span><span>Shared with: Cyberdyne × Sirius org</span><span id="refreshed">Last refreshed 6 minutes ago</span></div>
+
+    <div class="filters" role="group" aria-label="Date range">
+      <button class="chip" data-range="4" aria-pressed="false">Last 4 weeks</button>
+      <button class="chip" data-range="12" aria-pressed="true">Last 12 weeks</button>
+      <button class="chip" aria-pressed="false" disabled style="opacity:.6;cursor:default">Spaces: SCC, PSO</button>
+    </div>
+
+    <div class="grid">
+      <!-- KPIs -->
+      <section class="gadget span2" aria-labelledby="g0">
+        <div class="ghead"><h2 id="g0">Service health <span class="src">· Sirius Customer Care + Product Security Operations</span></h2></div>
+        <div class="gbody"><div class="kpis" id="kpis"></div></div>
+      </section>
+
+      <!-- created vs resolved -->
+      <section class="gadget" aria-labelledby="g1">
+        <div class="ghead"><h2 id="g1">Created vs. resolved <span class="src">· Filter: Consumer security, all spaces</span></h2></div>
+        <div class="gbody" id="cvr"></div>
+      </section>
+
+      <!-- pie -->
+      <section class="gadget" aria-labelledby="g2">
+        <div class="ghead"><h2 id="g2">Voice and security cases by product <span class="src">· Filter: SCC voice cases</span></h2></div>
+        <div class="gbody" id="pie"></div>
+      </section>
+
+      <!-- PSO incidents -->
+      <section class="gadget" aria-labelledby="g3">
+        <div class="ghead"><h2 id="g3">Open security incidents <span class="src">· Filter: PSO open incidents</span></h2></div>
+        <div class="gbody" id="pso"></div>
+      </section>
+
+      <!-- CSAT -->
+      <section class="gadget" aria-labelledby="g4">
+        <div class="ghead"><h2 id="g4">Customer satisfaction <span class="src">· Sirius Customer Care, last 12 weeks</span></h2></div>
+        <div class="gbody" id="csat"></div>
+      </section>
+
+      <!-- SCC recent -->
+      <section class="gadget span2" aria-labelledby="g5">
+        <div class="ghead"><h2 id="g5">Recent customer cases <span class="src">· Filter: SCC voice cases</span></h2></div>
+        <div class="gbody" id="scc"></div>
+      </section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== Demo data: edit keys and numbers here to match your site ===== */
+const DATA = {
+  mayaCase: { key: "SCC-16", summary: "My HappyBot unlocked our front door for a stranger", customer: "Maya Reid", product: "HappyBot 3.0" },
+  mayaIncident: { key: "PSO-6", summary: "[Consumer security] My HappyBot unlocked our front door for a stranger", severity: "Sev 2", assignee: "Sam Ortega", slaLeft: "7h 32m left" },
+  weeks: ["Aug 31","Sep 7","Sep 14","Sep 21","Sep 28","Oct 5","Oct 12","Oct 19","Oct 26","Nov 2","Nov 9","Nov 16"],
+  created:  [1,0,1,2,1,2,1,2,2,1,2,1],
+  resolved: [0,1,1,1,2,1,2,1,2,2,2,0],
+  byProduct: [["HappyBot 3.0",12],["HappyBot 2.5",2],["HomeHub AI Interface",1],["PC-100 Companion Robot",1]],
+  csatCounts: [1,1,3,12,31],            // ratings 1..5
+  history: [
+    ["SCC-15","HappyBot responds to everyone after factory reset","Priya Menon","HappyBot 3.0","Resolved"],
+    ["SCC-14","Voice recognition setup wizard keeps failing","Carlos Ruiz","HappyBot 2.5","Resolved"],
+    ["SCC-13","HappyBot obeyed impersonation of my voice","Yuki Tanaka","HappyBot 3.0","Resolved"],
+    ["SCC-12","HomeHub routine triggered by voice from another room","Daniel Okafor","HomeHub AI Interface","Resolved"],
+  ],
+};
+/* ==================================================================== */
+
+let state = new URLSearchParams(location.search).get("state") === "after" ? "after" : "before";
+let range = 12;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const PALETTE = ["--c1","--c2","--c3","--c4","--c5"].map(css);
+
+function view(){
+  const after = state === "after";
+  const created = DATA.created.slice(), resolved = DATA.resolved.slice();
+  if (after) resolved[resolved.length-1] += 1;
+  const csat = DATA.csatCounts.slice(); if (after) csat[4] += 1;
+  const n = csat.reduce((a,b)=>a+b,0), avg = csat.reduce((a,c,i)=>a+c*(i+1),0)/n;
+  return { after, created, resolved, csat, n, avg, openInc: after ? 0 : 1 };
+}
+
+function kpis(v){
+  const tiles = [
+    ["CSAT", `${v.avg.toFixed(1)} <small>/ 5</small>`, `<span class="delta good">▲ 0.3</span> since Day 1 · ${v.n} ratings`],
+    ["Median time to first response", `18 <small>min</small>`, `Goal 30 min · Care Plus goal 1 h`],
+    ["SLAs met", `96<small>%</small>`, `<span class="delta good">▲ 9 pts</span> since Day 1`],
+    ["Open security incidents", `${v.openInc}`, v.openInc ? `<span class="loz removed">Sev 2</span> within SLA` : `<span class="loz success">All clear</span>`],
+    ["Case → engineering hand-off", `< 1 <small>min</small>`, `Was ~1 day (email + Slack)`],
+  ];
+  $("kpis").innerHTML = tiles.map(([l,val,s])=>`<div class="kpi"><div class="lab">${l}</div><div class="val">${val}</div><div class="sub">${s}</div></div>`).join("");
+}
+
+function tipEl(host){ let t = host.querySelector(".tip"); if(!t){ t=document.createElement("div"); t.className="tip"; host.appendChild(t);} return t; }
+
+function lineChart(v){
+  const host = $("cvr");
+  const W = 560, H = 230, m = {l:32,r:16,t:12,b:28};
+  const k = range, weeks = DATA.weeks.slice(-k), c = v.created.slice(-k), r = v.resolved.slice(-k);
+  const max = Math.max(4, ...c, ...r);
+  const x = i => m.l + (W-m.l-m.r) * (k===1?0:i/(k-1));
+  const y = val => H-m.b - (H-m.t-m.b) * val/max;
+  const path = arr => arr.map((d,i)=>`${i?"L":"M"}${x(i).toFixed(1)},${y(d).toFixed(1)}`).join("");
+  const area = arr => `${path(arr)}L${x(k-1)},${y(0)}L${x(0)},${y(0)}Z`;
+  let g = "";
+  for (let t=0;t<=max;t+= max>6?2:1) g += `<line x1="${m.l}" x2="${W-m.r}" y1="${y(t)}" y2="${y(t)}" stroke="#091E4214"/><text x="${m.l-8}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="#626F86">${t}</text>`;
+  const step = k>6?2:1;
+  weeks.forEach((w,i)=>{ if(i%step===0) g += `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#626F86">${w}</text>`; });
+  const cc = css("--created"), rc = css("--resolved");
+  const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Created versus resolved consumer security work items per week">
+    ${g}
+    <path d="${area(c)}" fill="${cc}" opacity=".10"/><path d="${area(r)}" fill="${rc}" opacity=".10"/>
+    <path d="${path(c)}" fill="none" stroke="${cc}" stroke-width="2" stroke-dasharray="5 3"/>
+    <path d="${path(r)}" fill="none" stroke="${rc}" stroke-width="2"/>
+    <line id="xh" y1="${m.t}" y2="${H-m.b}" stroke="#758195" stroke-width="1" opacity="0"/>
+    <g id="dots"></g>
+    <rect x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="transparent" id="hit"/>
+  </svg>`;
+  const totC = c.reduce((a,b)=>a+b,0), totR = r.reduce((a,b)=>a+b,0);
+  host.innerHTML = `<div class="legend"><span><svg width="18" height="4"><line x1="0" x2="18" y1="2" y2="2" stroke="${cc}" stroke-width="2" stroke-dasharray="5 3"/></svg>Created (${totC})</span><span><svg width="18" height="4"><line x1="0" x2="18" y1="2" y2="2" stroke="${rc}" stroke-width="2"/></svg>Resolved (${totR})</span></div>${svg}
+    <table class="sr"><caption>Created vs resolved per week</caption><tr><th>Week</th><th>Created</th><th>Resolved</th></tr>${weeks.map((w,i)=>`<tr><td>${w}</td><td>${c[i]}</td><td>${r[i]}</td></tr>`).join("")}</table>`;
+  const svgEl = host.querySelector("svg"), hit = host.querySelector("#hit"), xh = host.querySelector("#xh"), dots = host.querySelector("#dots"), tip = tipEl(host);
+  hit.addEventListener("mousemove", e=>{
+    const pt = svgEl.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY;
+    const p = pt.matrixTransform(svgEl.getScreenCTM().inverse());
+    const i = Math.max(0, Math.min(k-1, Math.round((p.x-m.l)/((W-m.l-m.r)/(k-1||1)))));
+    xh.setAttribute("x1",x(i)); xh.setAttribute("x2",x(i)); xh.setAttribute("opacity",1);
+    dots.innerHTML = `<circle cx="${x(i)}" cy="${y(c[i])}" r="4.5" fill="${cc}" stroke="#fff" stroke-width="2"/><circle cx="${x(i)}" cy="${y(r[i])}" r="4.5" fill="${rc}" stroke="#fff" stroke-width="2"/>`;
+    tip.innerHTML = `<b>Week of ${weeks[i]}</b><br>Created: ${c[i]}<br>Resolved: ${r[i]}`;
+    const box = host.getBoundingClientRect();
+    tip.style.left = Math.min(e.clientX-box.left+12, box.width-140)+"px"; tip.style.top = (e.clientY-box.top-10)+"px"; tip.style.opacity=1;
+  });
+  hit.addEventListener("mouseleave", ()=>{ xh.setAttribute("opacity",0); dots.innerHTML=""; tip.style.opacity=0; });
+}
+
+function pie(){
+  const host = $("pie"), data = DATA.byProduct, total = data.reduce((a,d)=>a+d[1],0);
+  const R = 84, r0 = 52, cx = 100, cy = 100; let a0 = -Math.PI/2, segs = "";
+  data.forEach(([name,val],i)=>{
+    const a1 = a0 + 2*Math.PI*val/total, large = a1-a0 > Math.PI ? 1 : 0;
+    const p = (rad,a)=>`${(cx+rad*Math.cos(a)).toFixed(2)},${(cy+rad*Math.sin(a)).toFixed(2)}`;
+    segs += `<path data-i="${i}" d="M${p(R,a0)}A${R},${R} 0 ${large} 1 ${p(R,a1)}L${p(r0,a1)}A${r0},${r0} 0 ${large} 0 ${p(r0,a0)}Z" fill="${PALETTE[i]}" stroke="#fff" stroke-width="2" style="cursor:pointer"/>`;
+    a0 = a1;
+  });
+  host.innerHTML = `<div class="pie-wrap">
+    <svg viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Cases by product">${segs}
+      <text x="100" y="98" text-anchor="middle" font-size="26" font-weight="653" fill="#172B4D">${total}</text>
+      <text x="100" y="118" text-anchor="middle" font-size="12" fill="#626F86">cases</text></svg>
+    <table class="pie-table" style="flex:1;min-width:220px"><tr><th>Product model</th><th class="num">Cases</th><th class="num">%</th></tr>
+      ${data.map(([n,v],i)=>`<tr data-i="${i}"><td><span class="sw" style="background:${PALETTE[i]};margin-right:8px;vertical-align:-1px"></span>${n}</td><td class="num">${v}</td><td class="num">${Math.round(v*100/total)}%</td></tr>`).join("")}
+    </table></div>
+    <div class="gfoot">Most reports concern HappyBot 3.0 on firmware HB3-fw-4.2 (no voice-print check).</div>`;
+  const tip = tipEl(host);
+  host.querySelectorAll("path[data-i]").forEach(el=>{
+    el.addEventListener("mousemove", e=>{ const [n,v]=data[+el.dataset.i]; tip.innerHTML=`<b>${n}</b><br>${v} cases · ${Math.round(v*100/total)}%`; const b=host.getBoundingClientRect(); tip.style.left=(e.clientX-b.left+12)+"px"; tip.style.top=(e.clientY-b.top-10)+"px"; tip.style.opacity=1; el.setAttribute("opacity",.85); });
+    el.addEventListener("mouseleave", ()=>{ tip.style.opacity=0; el.removeAttribute("opacity"); });
+  });
+}
+
+function pso(v){
+  const i = DATA.mayaIncident;
+  $("pso").innerHTML = v.openInc ? `<table><tr><th>Key</th><th>Summary</th><th>Severity</th><th>SLA</th><th>Assignee</th></tr>
+    <tr><td class="key"><a href="#">${i.key}</a></td><td class="sum" title="${i.summary}">${i.summary}</td><td><span class="loz removed">${i.severity}</span></td><td><span class="sla run">${i.slaLeft}</span></td><td class="nw"><span class="avatar" style="background:#0C66E4;width:20px;height:20px;font-size:9px;vertical-align:middle;margin-right:6px">SO</span>${i.assignee}</td></tr></table>
+    <div class="gfoot">1 work item · linked to customer case ${DATA.mayaCase.key}</div>`
+    : `<div class="empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22A06B" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 10"/></svg><div style="margin-top:8px;font-weight:500;color:#172B4D">No open security incidents</div><div>${i.key} resolved within SLA · fix ships in HB3-fw-4.3</div></div>`;
+}
+
+function csat(v){
+  const host = $("csat"), max = Math.max(...v.csat), W = 520, rowH = 30, labW = 70;
+  let rows = "";
+  for (let s=5; s>=1; s--){
+    const val = v.csat[s-1], y = (5-s)*rowH + 6, w = (W-labW-50) * val/max;
+    rows += `<text x="0" y="${y+15}" font-size="12" fill="#44546F">${"★".repeat(s)}</text>
+      <rect x="${labW}" y="${y}" width="${Math.max(w,2)}" height="18" rx="4" fill="${css("--c1")}"><title>${s} stars: ${val}</title></rect>
+      <text x="${labW+w+8}" y="${y+14}" font-size="12" fill="#172B4D">${val}</text>`;
+  }
+  host.innerHTML = `<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><span style="font-size:28px;font-weight:653">${v.avg.toFixed(1)}</span><span style="color:#626F86">average from ${v.n} ratings</span></div>
+    <svg viewBox="0 0 ${W} ${5*rowH+8}" width="100%" role="img" aria-label="CSAT rating distribution">${rows}</svg>
+    <div class="gfoot">${v.after ? `Latest: ★★★★★ from ${DATA.mayaCase.customer} on ${DATA.mayaCase.key}, \"Fast, clear and reassuring.\"` : `Surveys are sent automatically when a case is resolved.`}</div>`;
+}
+
+function scc(v){
+  const m = DATA.mayaCase;
+  const rows = [[m.key, m.summary, m.customer, m.product, v.after ? "Resolved" : "In progress"], ...DATA.history];
+  const loz = s => s==="Resolved" ? `<span class="loz success">Resolved</span>` : `<span class="loz inprogress">${s}</span>`;
+  $("scc").innerHTML = `<table><tr><th>Key</th><th>Summary</th><th>Customer</th><th>Product model</th><th>Status</th><th>Time to first response</th></tr>
+    ${rows.map((r,i)=>`<tr><td class="key"><a href="#">${r[0]}</a></td><td class="sum" title="${r[1]}">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${loz(r[4])}</td><td><span class="sla ok">${i===0?"Met · 4m":"Met"}</span></td></tr>`).join("")}</table>
+    <div class="gfoot">Showing 5 of ${DATA.byProduct.reduce((a,d)=>a+d[1],0)} work items</div>`;
+}
+
+function render(){ const v = view(); kpis(v); lineChart(v); pie(); pso(v); csat(v); scc(v); }
+
+function refresh(){
+  state = state === "before" ? "after" : "before";
+  $("refreshed").textContent = "Last refreshed just now";
+  const t = $("toast"); t.textContent = state==="after" ? "Dashboard refreshed" : "Dashboard refreshed (reset)"; t.style.opacity = 1; setTimeout(()=>t.style.opacity=0, 1600);
+  render();
+}
+$("refresh").addEventListener("click", refresh);
+document.addEventListener("keydown", e=>{ if((e.key==="r"||e.key==="R") && !e.metaKey && !e.ctrlKey) refresh(); });
+document.querySelectorAll(".chip[data-range]").forEach(b=>b.addEventListener("click", ()=>{
+  range = +b.dataset.range; document.querySelectorAll(".chip[data-range]").forEach(x=>x.setAttribute("aria-pressed", x===b)); render();
+}));
+render();
+</script>
+</body>
+</html>
